@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="CopyFilesTaskIntegrationTest" default="test">
+
+	<taskdef name="copy-files" classname="VasekPurchart\Phing\CopyFiles\CopyFilesTask"/>
+
+	<target name="testCopyFile">
+		<copy-files>
+			<file source="foo" target="foo-copy"/>
+		</copy-files>
+	</target>
+
+	<target name="testCopyFileWithAbsolutePath">
+		<copy-files>
+			<file source="${project.basedir}/foo" target="${project.basedir}/foo-copy"/>
+		</copy-files>
+	</target>
+
+	<target name="testCopyMultipleFiles">
+		<copy-files>
+			<file source="foo" target="foo-copy"/>
+			<file source="bar" target="bar-copy"/>
+		</copy-files>
+	</target>
+
+	<target name="testCopyNonExistentFile">
+		<copy-files>
+			<file source="XXX" target="YYY"/>
+		</copy-files>
+	</target>
+
+	<target name="testCopyMultipleNonExistentFiles">
+		<copy-files>
+			<file source="FOO" target="LOREM"/>
+			<file source="BAR" target="LOREM"/>
+		</copy-files>
+	</target>
+
+	<target name="testCopyFileToNonExistingDirectory">
+		<copy-files>
+			<file source="foo" target="non-existing-directory/foo-copy"/>
+		</copy-files>
+	</target>
+
+	<target name="testMissingCopyFileElement">
+		<copy-files>
+		</copy-files>
+	</target>
+
+	<target name="testMissingSource">
+		<copy-files>
+			<file target="BAR"/>
+		</copy-files>
+	</target>
+
+	<target name="testMissingTarget">
+		<copy-files>
+			<file source="FOO"/>
+		</copy-files>
+	</target>
+
+</project>

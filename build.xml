@@ -6,6 +6,7 @@
 
 	<property file="${path.build.properties.local}"/>
 
+	<property name="file.mode.writable" value="0775"/>
 	<property name="path.bin" value="${path.root}/bin"/>
 	<property name="path.composer.executable" value="composer"/>
 	<property name="path.phpcs.executable" value="${path.bin}/phpcs"/>
@@ -16,9 +17,11 @@
 	<property name="path.root" value="${project.basedir}"/>
 	<property name="path.src" value="${path.root}/src"/>
 	<property name="path.tests" value="${path.root}/tests"/>
+	<property name="path.tests.temp" value="${path.tests}/temp"/>
 	<property name="path.vendor" value="${path.root}/vendor"/>
 
 	<target name="build" depends="
+		create-dirs,
 		composer,
 		phplint,
 		cs,
@@ -46,6 +49,10 @@
 			<arg value="validate"/>
 		</exec>
 	</target>
+
+	<target name="create-dirs">
+        <mkdir dir="${path.tests.temp}" mode="${file.mode.writable}"/>
+    </target>
 
 	<target name="cs">
 		<exec
