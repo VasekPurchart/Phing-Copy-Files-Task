@@ -1,0 +1,13 @@
+{
+	"name": "vasek-purchart/phing-copy-files-task",
+	"description": "Copy files with better control over copying than the default Phing CopyTask",
+	"keywords": ["phing", "task", "copy", "file"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Vašek Purchart",
+			"email": "me@vasekpurchart.cz",
+			"homepage": "http://vasekpurchart.cz"
+		}
+	]
+}
