@@ -15,10 +15,41 @@
 		</copy-files>
 	</target>
 
+	<target name="testTargetFileExists">
+		<copy-files>
+			<file source="new" target="existing"/>
+		</copy-files>
+	</target>
+
+	<target name="testTargetFileExistsSkip">
+		<copy-files existsmode="skip">
+			<file source="new" target="existing"/>
+		</copy-files>
+	</target>
+
+	<target name="testTargetFileExistsReplace">
+		<copy-files existsmode="replace">
+			<file source="new" target="existing"/>
+		</copy-files>
+	</target>
+
+	<target name="testTargetFileExistsFail">
+		<copy-files existsmode="fail">
+			<file source="new" target="existing"/>
+		</copy-files>
+	</target>
+
 	<target name="testCopyMultipleFiles">
 		<copy-files>
 			<file source="foo" target="foo-copy"/>
 			<file source="bar" target="bar-copy"/>
+		</copy-files>
+	</target>
+
+	<target name="testReplaceMultipleFilesWithExistingTargets">
+		<copy-files existsmode="replace">
+			<file source="foo-new" target="foo-existing"/>
+			<file source="bar-new" target="bar-existing"/>
 		</copy-files>
 	</target>
 
@@ -55,6 +86,12 @@
 	<target name="testMissingTarget">
 		<copy-files>
 			<file source="FOO"/>
+		</copy-files>
+	</target>
+
+	<target name="testInvalidFileExistsMode">
+		<copy-files existsmode="invalid-mode">
+			<file source="new" target="existing"/>
 		</copy-files>
 	</target>
 

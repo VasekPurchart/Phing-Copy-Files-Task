@@ -9,8 +9,23 @@ use Project;
 class CopyFilesTask extends \Task
 {
 
+	const EXISTS_MODE_FAIL = 'fail';
+	const EXISTS_MODE_REPLACE = 'replace';
+	const EXISTS_MODE_SKIP = 'skip';
+
 	/** @var \VasekPurchart\Phing\CopyFiles\CopyFileElement[] */
 	private $copyFiles = [];
+
+	/** @var string|null */
+	private $existsMode;
+
+	/**
+	 * @param string $mode
+	 */
+	public function setExistsMode(string $mode)
+	{
+		$this->existsMode = $mode;
+	}
 
 	public function main()
 	{
@@ -24,6 +39,23 @@ class CopyFilesTask extends \Task
 				continue;
 			}
 			$targetPath = $this->project->resolveFile($copyFile->getTarget())->getAbsolutePath();
+			if (file_exists($targetPath)) {
+				$fileExistsMode = $this->getCopyFileFileExistsMode($copyFile);
+				$message = sprintf('Target file %s already exists.', $targetPath);
+				switch ($fileExistsMode) {
+					case self::EXISTS_MODE_FAIL:
+						$errors[] = $message;
+						continue 2;
+					case self::EXISTS_MODE_SKIP:
+						$this->log($message . ' -> SKIPPING', Project::MSG_INFO);
+						continue 2;
+					case self::EXISTS_MODE_REPLACE:
+						$this->log($message, Project::MSG_VERBOSE);
+						break;
+					default:
+						throw new \Exception('Unexpected existsMode');
+				}
+			}
 
 			$this->log(sprintf('Copying file: %s -> %s', $sourcePath, $targetPath), Project::MSG_INFO);
 			if (!@copy($sourcePath, $targetPath)) {
@@ -50,6 +82,41 @@ class CopyFilesTask extends \Task
 		foreach ($this->copyFiles as $copyFile) {
 			$copyFile->validateAttributes();
 		}
+		if ($this->existsMode !== null) {
+			static::checkAllowedExistsMode($this->existsMode);
+		}
+	}
+
+	/**
+	 * @param string $mode
+	 */
+	public static function checkAllowedExistsMode(string $mode)
+	{
+		$allowed = static::getAllowedExistsModes();
+		if (!in_array($mode, $allowed, true)) {
+			throw new \BuildException('Invalid CopyFiles mode "' . $mode . '" (choices: ' . implode('/', $allowed) . ')');
+		}
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public static function getAllowedExistsModes(): array
+	{
+		return [
+			static::EXISTS_MODE_FAIL,
+			static::EXISTS_MODE_REPLACE,
+			static::EXISTS_MODE_SKIP,
+		];
+	}
+
+	private function getCopyFileFileExistsMode(CopyFileElement $copyFile): string
+	{
+		if ($this->existsMode !== null) {
+			return $this->existsMode;
+		}
+
+		return self::EXISTS_MODE_SKIP;
 	}
 
 	/**
