@@ -161,6 +161,71 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$tester->assertLogMessageRegExp('~/bar-existing.+already exists~', $target, Project::MSG_VERBOSE);
 	}
 
+	public function testCopyMultipleFilesWithExistingTargetsUsingDifferentModes()
+	{
+		$sourceSkipFilePath = self::TEMP_DIRECTORY_PATH . '/skip-new';
+		file_put_contents($sourceSkipFilePath, 'SKIP-NEW');
+		$targetSkipFilePath = self::TEMP_DIRECTORY_PATH . '/skip-existing';
+		file_put_contents($targetSkipFilePath, 'SKIP-EXISTING');
+
+		$sourceReplaceFilePath = self::TEMP_DIRECTORY_PATH . '/replace-new';
+		file_put_contents($sourceReplaceFilePath, 'REPLACE-NEW');
+		$targetReplaceFilePath = self::TEMP_DIRECTORY_PATH . '/replace-existing';
+		file_put_contents($targetReplaceFilePath, 'REPLACE-EXISTING');
+
+		$sourceDefaultFilePath = self::TEMP_DIRECTORY_PATH . '/default-new';
+		file_put_contents($sourceDefaultFilePath, 'DEFAULT-NEW');
+		$targetDefaultFilePath = self::TEMP_DIRECTORY_PATH . '/default-existing';
+		file_put_contents($targetDefaultFilePath, 'DEFAULT-EXISTING');
+
+		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
+		$target = __FUNCTION__;
+		$tester->executeTarget($target);
+
+		$this->assertFileExists($targetSkipFilePath);
+		$this->assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
+
+		$this->assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
+		$tester->assertLogMessageRegExp('~Copying.+/replace-new.+->.+/replace-existing~', $target, Project::MSG_INFO);
+		$tester->assertLogMessageRegExp('~/replace-existing.+already exists~', $target, Project::MSG_VERBOSE);
+
+		$this->assertFileExists($targetDefaultFilePath);
+		$this->assertSame('DEFAULT-EXISTING', file_get_contents($targetDefaultFilePath));
+	}
+
+	public function testCopyMultipleFilesWithExistingTargetsUsingDifferentModesWithReplaceFallback()
+	{
+		$sourceSkipFilePath = self::TEMP_DIRECTORY_PATH . '/skip-new';
+		file_put_contents($sourceSkipFilePath, 'SKIP-NEW');
+		$targetSkipFilePath = self::TEMP_DIRECTORY_PATH . '/skip-existing';
+		file_put_contents($targetSkipFilePath, 'SKIP-EXISTING');
+
+		$sourceReplaceFilePath = self::TEMP_DIRECTORY_PATH . '/replace-new';
+		file_put_contents($sourceReplaceFilePath, 'REPLACE-NEW');
+		$targetReplaceFilePath = self::TEMP_DIRECTORY_PATH . '/replace-existing';
+		file_put_contents($targetReplaceFilePath, 'REPLACE-EXISTING');
+
+		$sourceDefaultFilePath = self::TEMP_DIRECTORY_PATH . '/default-new';
+		file_put_contents($sourceDefaultFilePath, 'DEFAULT-NEW');
+		$targetDefaultFilePath = self::TEMP_DIRECTORY_PATH . '/default-existing';
+		file_put_contents($targetDefaultFilePath, 'DEFAULT-EXISTING');
+
+		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
+		$target = __FUNCTION__;
+		$tester->executeTarget($target);
+
+		$this->assertFileExists($targetSkipFilePath);
+		$this->assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
+
+		$this->assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
+		$tester->assertLogMessageRegExp('~Copying.+/replace-new.+->.+/replace-existing~', $target, Project::MSG_INFO);
+		$tester->assertLogMessageRegExp('~/replace-existing.+already exists~', $target, Project::MSG_VERBOSE);
+
+		$this->assertFileEquals($sourceDefaultFilePath, $targetDefaultFilePath);
+		$tester->assertLogMessageRegExp('~Copying.+/default-new.+->.+/default-existing~', $target, Project::MSG_INFO);
+		$tester->assertLogMessageRegExp('~/default-existing.+already exists~', $target, Project::MSG_VERBOSE);
+	}
+
 	public function testCopyNonExistentFile()
 	{
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');

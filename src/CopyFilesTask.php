@@ -112,6 +112,9 @@ class CopyFilesTask extends \Task
 
 	private function getCopyFileFileExistsMode(CopyFileElement $copyFile): string
 	{
+		if ($copyFile->getExistsMode() !== null) {
+			return $copyFile->getExistsMode();
+		}
 		if ($this->existsMode !== null) {
 			return $this->existsMode;
 		}

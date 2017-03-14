@@ -53,6 +53,22 @@
 		</copy-files>
 	</target>
 
+	<target name="testCopyMultipleFilesWithExistingTargetsUsingDifferentModes">
+		<copy-files>
+			<file source="skip-new" target="skip-existing" existsmode="skip"/>
+			<file source="replace-new" target="replace-existing" existsmode="replace"/>
+			<file source="default-new" target="default-existing"/>
+		</copy-files>
+	</target>
+
+	<target name="testCopyMultipleFilesWithExistingTargetsUsingDifferentModesWithReplaceFallback">
+		<copy-files existsmode="replace">
+			<file source="skip-new" target="skip-existing" existsmode="skip"/>
+			<file source="replace-new" target="replace-existing" existsmode="replace"/>
+			<file source="default-new" target="default-existing"/>
+		</copy-files>
+	</target>
+
 	<target name="testCopyNonExistentFile">
 		<copy-files>
 			<file source="XXX" target="YYY"/>

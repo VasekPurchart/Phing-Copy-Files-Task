@@ -13,6 +13,9 @@ class CopyFileElement
 	/** @var string|null */
 	private $target;
 
+	/** @var string|null */
+	private $existsMode;
+
 	/**
 	 * @return string|null
 	 */
@@ -39,6 +42,22 @@ class CopyFileElement
 		$this->target = $target;
 	}
 
+	/**
+	 * @return string|null
+	 */
+	public function getExistsMode()
+	{
+		return $this->existsMode;
+	}
+
+	/**
+	 * @param string $mode
+	 */
+	public function setExistsMode(string $mode)
+	{
+		$this->existsMode = $mode;
+	}
+
 	public function validateAttributes()
 	{
 		if ($this->getSource() === null) {
@@ -46,6 +65,9 @@ class CopyFileElement
 		}
 		if ($this->getTarget() === null) {
 			throw new \BuildException('<file> must have the `target` attribute');
+		}
+		if ($this->getExistsMode() !== null) {
+			CopyFilesTask::checkAllowedExistsMode($this->getExistsMode());
 		}
 	}
 
