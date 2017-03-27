@@ -28,6 +28,14 @@
 		tests
 	"/>
 
+	<target name="ci-build" depends="
+		composer-validate,
+		create-dirs,
+		phplint,
+		cs,
+		tests
+	"/>
+
 	<target name="composer" depends="composer-validate">
 		<exec
 			executable="${path.composer.executable}"
