@@ -53,7 +53,10 @@ class CopyFilesTask extends \Task
 						$this->log($message, Project::MSG_VERBOSE);
 						break;
 					default:
+						// @codeCoverageIgnoreStart
+						// should be unreachable
 						throw new \Exception('Unexpected existsMode');
+						// @codeCoverageIgnoreEnd
 				}
 			}
 
