@@ -19,9 +19,6 @@ class CopyFilesTask extends \Task
 	/** @var string|null */
 	private $existsMode;
 
-	/**
-	 * @param string $mode
-	 */
 	public function setExistsMode(string $mode)
 	{
 		$this->existsMode = $mode;
@@ -90,9 +87,6 @@ class CopyFilesTask extends \Task
 		}
 	}
 
-	/**
-	 * @param string $mode
-	 */
 	public static function checkAllowedExistsMode(string $mode)
 	{
 		$allowed = static::getAllowedExistsModes();

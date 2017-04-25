@@ -50,9 +50,6 @@ class CopyFileElement
 		return $this->existsMode;
 	}
 
-	/**
-	 * @param string $mode
-	 */
 	public function setExistsMode(string $mode)
 	{
 		$this->existsMode = $mode;
