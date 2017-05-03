@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace VasekPurchart\Phing\CopyFiles;
 
 use Project;
-
 use VasekPurchart\Phing\PhingTester\PhingTester;
 
 class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
