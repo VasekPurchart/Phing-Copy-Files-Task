@@ -16,46 +16,37 @@ class CopyFileElement
 	/** @var string|null */
 	private $existsMode;
 
-	/**
-	 * @return string|null
-	 */
-	public function getSource()
+	public function getSource(): ?string
 	{
 		return $this->source;
 	}
 
-	public function setSource(string $source)
+	public function setSource(string $source): void
 	{
 		$this->source = $source;
 	}
 
-	/**
-	 * @return string|null
-	 */
-	public function getTarget()
+	public function getTarget(): ?string
 	{
 		return $this->target;
 	}
 
-	public function setTarget(string $target)
+	public function setTarget(string $target): void
 	{
 		$this->target = $target;
 	}
 
-	/**
-	 * @return string|null
-	 */
-	public function getExistsMode()
+	public function getExistsMode(): ?string
 	{
 		return $this->existsMode;
 	}
 
-	public function setExistsMode(string $mode)
+	public function setExistsMode(string $mode): void
 	{
 		$this->existsMode = $mode;
 	}
 
-	public function validateAttributes()
+	public function validateAttributes(): void
 	{
 		if ($this->getSource() === null) {
 			throw new \BuildException('<file> must have the `source` attribute');

@@ -9,9 +9,9 @@ use Project;
 class CopyFilesTask extends \Task
 {
 
-	const EXISTS_MODE_FAIL = 'fail';
-	const EXISTS_MODE_REPLACE = 'replace';
-	const EXISTS_MODE_SKIP = 'skip';
+	public const EXISTS_MODE_FAIL = 'fail';
+	public const EXISTS_MODE_REPLACE = 'replace';
+	public const EXISTS_MODE_SKIP = 'skip';
 
 	/** @var \VasekPurchart\Phing\CopyFiles\CopyFileElement[] */
 	private $copyFiles = [];
@@ -19,12 +19,12 @@ class CopyFilesTask extends \Task
 	/** @var string|null */
 	private $existsMode;
 
-	public function setExistsMode(string $mode)
+	public function setExistsMode(string $mode): void
 	{
 		$this->existsMode = $mode;
 	}
 
-	public function main()
+	public function main(): void
 	{
 		$this->validateAttributes();
 
@@ -74,7 +74,7 @@ class CopyFilesTask extends \Task
 		return $copyFile;
 	}
 
-	private function validateAttributes()
+	private function validateAttributes(): void
 	{
 		if (count($this->copyFiles) === 0) {
 			throw new \BuildException('At least one <file> element expected');
@@ -87,7 +87,7 @@ class CopyFilesTask extends \Task
 		}
 	}
 
-	public static function checkAllowedExistsMode(string $mode)
+	public static function checkAllowedExistsMode(string $mode): void
 	{
 		$allowed = static::getAllowedExistsModes();
 		if (!in_array($mode, $allowed, true)) {
@@ -122,7 +122,7 @@ class CopyFilesTask extends \Task
 	/**
 	 * @param string[] $errors
 	 */
-	private function handleErrors(array $errors)
+	private function handleErrors(array $errors): void
 	{
 		if (count($errors) > 0) {
 			foreach ($errors as $error) {
