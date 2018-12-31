@@ -3,10 +3,10 @@
 	<rule ref="../vendor/consistence/coding-standard/Consistence/ruleset.xml"/>
 	<rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
 		<properties>
-			<property name="rootNamespaces" type="array" value="
-				src => VasekPurchart\Phing\CopyFiles,
-				tests => VasekPurchart\Phing\CopyFiles,
-			"/>
+			<property name="rootNamespaces" type="array">
+				<element key="src" value="VasekPurchart\Phing\CopyFiles"/>
+				<element key="tests" value="VasekPurchart\Phing\CopyFiles"/>
+			</property>
 		</properties>
 		<exclude-pattern>*/data/*.php</exclude-pattern>
 		<exclude-pattern>*/exceptions/*Exception.php</exclude-pattern>
