@@ -269,7 +269,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 
 		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageRegExp('~one.+<file>.+expected~');
+		$this->expectExceptionMessageMatches('~one.+<file>.+expected~');
 
 		$tester->executeTarget($target);
 	}
@@ -280,7 +280,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 
 		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageRegExp('~<file>.+`source`~');
+		$this->expectExceptionMessageMatches('~<file>.+`source`~');
 
 		$tester->executeTarget($target);
 	}
@@ -291,7 +291,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 
 		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageRegExp('~<file>.+`target`~');
+		$this->expectExceptionMessageMatches('~<file>.+`target`~');
 
 		$tester->executeTarget($target);
 	}
@@ -302,7 +302,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 
 		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageRegExp('~invalid.+mode~i');
+		$this->expectExceptionMessageMatches('~invalid.+mode~i');
 
 		$tester->executeTarget($target);
 	}
