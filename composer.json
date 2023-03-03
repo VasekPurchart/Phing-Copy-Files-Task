@@ -11,8 +11,8 @@
 		}
 	],
 	"require": {
-		"php": "~7.2",
-		"phing/phing": "~2.16"
+		"php": "^7.2",
+		"phing/phing": "^2.16"
 	},
 	"require-dev": {
 		"consistence/coding-standard": "3.10.1",
