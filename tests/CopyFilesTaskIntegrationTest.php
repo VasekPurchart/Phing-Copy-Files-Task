@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace VasekPurchart\Phing\CopyFiles;
 
+use PHPUnit\Framework\Assert;
 use Project;
 use VasekPurchart\Phing\PhingTester\PhingTester;
 
@@ -25,7 +26,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileEquals($sourceFilePath, $targetFilePath);
+		Assert::assertFileEquals($sourceFilePath, $targetFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/foo.+->.+/foo-copy~', $target, Project::MSG_INFO);
 	}
 
@@ -42,7 +43,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileEquals($sourceFilePath, $targetFilePath);
+		Assert::assertFileEquals($sourceFilePath, $targetFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/foo.+->.+/foo-copy~', $target, Project::MSG_INFO);
 	}
 
@@ -57,8 +58,8 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileExists($targetFilePath);
-		$this->assertSame('EXISTING', file_get_contents($targetFilePath));
+		Assert::assertFileExists($targetFilePath);
+		Assert::assertSame('EXISTING', file_get_contents($targetFilePath));
 		$tester->assertLogMessageRegExp('~/existing.+already exists.+SKIPPING~', $target, Project::MSG_INFO);
 	}
 
@@ -73,8 +74,8 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileExists($targetFilePath);
-		$this->assertSame('EXISTING', file_get_contents($targetFilePath));
+		Assert::assertFileExists($targetFilePath);
+		Assert::assertSame('EXISTING', file_get_contents($targetFilePath));
 		$tester->assertLogMessageRegExp('~/existing.+already exists.+SKIPPING~', $target, Project::MSG_INFO);
 	}
 
@@ -89,7 +90,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileEquals($sourceFilePath, $targetFilePath);
+		Assert::assertFileEquals($sourceFilePath, $targetFilePath);
 		$tester->assertLogMessageRegExp('~/existing.+already exists~', $target, Project::MSG_VERBOSE);
 	}
 
@@ -105,8 +106,8 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 
 		$tester->expectFailedBuild($target);
 
-		$this->assertFileExists($targetFilePath);
-		$this->assertSame('EXISTING', file_get_contents($targetFilePath));
+		Assert::assertFileExists($targetFilePath);
+		Assert::assertSame('EXISTING', file_get_contents($targetFilePath));
 		$tester->assertLogMessageRegExp('~/existing.+already exists~', $target, Project::MSG_ERR);
 	}
 
@@ -129,9 +130,9 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileEquals($sourceFooFilePath, $targetFooFilePath);
+		Assert::assertFileEquals($sourceFooFilePath, $targetFooFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/foo.+->.+/foo-copy~', $target, Project::MSG_INFO);
-		$this->assertFileEquals($sourceBarFilePath, $targetBarFilePath);
+		Assert::assertFileEquals($sourceBarFilePath, $targetBarFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/bar.+->.+/bar-copy~', $target, Project::MSG_INFO);
 	}
 
@@ -151,11 +152,11 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileEquals($sourceFooFilePath, $targetFooFilePath);
+		Assert::assertFileEquals($sourceFooFilePath, $targetFooFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/foo-new.+->.+/foo-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/foo-existing.+already exists~', $target, Project::MSG_VERBOSE);
 
-		$this->assertFileEquals($sourceBarFilePath, $targetBarFilePath);
+		Assert::assertFileEquals($sourceBarFilePath, $targetBarFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/bar-new.+->.+/bar-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/bar-existing.+already exists~', $target, Project::MSG_VERBOSE);
 	}
@@ -181,15 +182,15 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileExists($targetSkipFilePath);
-		$this->assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
+		Assert::assertFileExists($targetSkipFilePath);
+		Assert::assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
 
-		$this->assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
+		Assert::assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/replace-new.+->.+/replace-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/replace-existing.+already exists~', $target, Project::MSG_VERBOSE);
 
-		$this->assertFileExists($targetDefaultFilePath);
-		$this->assertSame('DEFAULT-EXISTING', file_get_contents($targetDefaultFilePath));
+		Assert::assertFileExists($targetDefaultFilePath);
+		Assert::assertSame('DEFAULT-EXISTING', file_get_contents($targetDefaultFilePath));
 	}
 
 	public function testCopyMultipleFilesWithExistingTargetsUsingDifferentModesWithReplaceFallback(): void
@@ -213,14 +214,14 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileExists($targetSkipFilePath);
-		$this->assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
+		Assert::assertFileExists($targetSkipFilePath);
+		Assert::assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
 
-		$this->assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
+		Assert::assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/replace-new.+->.+/replace-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/replace-existing.+already exists~', $target, Project::MSG_VERBOSE);
 
-		$this->assertFileEquals($sourceDefaultFilePath, $targetDefaultFilePath);
+		Assert::assertFileEquals($sourceDefaultFilePath, $targetDefaultFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/default-new.+->.+/default-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/default-existing.+already exists~', $target, Project::MSG_VERBOSE);
 	}
