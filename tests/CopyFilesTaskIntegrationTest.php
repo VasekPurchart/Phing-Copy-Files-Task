@@ -266,46 +266,62 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 
 	public function testMissingCopyFileElement(): void
 	{
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
+		$buildFilePath = __DIR__ . '/copy-files-task-integration-test.xml';
+		$tester = new PhingTester($buildFilePath);
 		$target = __FUNCTION__;
 
-		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageMatches('~one.+<file>.+expected~');
-
-		$tester->executeTarget($target);
+		try {
+			$tester->executeTarget($target);
+			Assert::fail('Exception expected');
+		} catch (\BuildException $e) {
+			Assert::assertStringStartsWith($buildFilePath, $e->getLocation()->toString());
+			Assert::assertRegExp('~one.+<file>.+expected~', $e->getMessage());
+		}
 	}
 
 	public function testMissingSource(): void
 	{
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
+		$buildFilePath = __DIR__ . '/copy-files-task-integration-test.xml';
+		$tester = new PhingTester($buildFilePath);
 		$target = __FUNCTION__;
 
-		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageMatches('~<file>.+`source`~');
-
-		$tester->executeTarget($target);
+		try {
+			$tester->executeTarget($target);
+			Assert::fail('Exception expected');
+		} catch (\BuildException $e) {
+			Assert::assertStringStartsWith($buildFilePath, $e->getLocation()->toString());
+			Assert::assertRegExp('~<file>.+`source`~', $e->getMessage());
+		}
 	}
 
 	public function testMissingTarget(): void
 	{
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
+		$buildFilePath = __DIR__ . '/copy-files-task-integration-test.xml';
+		$tester = new PhingTester($buildFilePath);
 		$target = __FUNCTION__;
 
-		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageMatches('~<file>.+`target`~');
-
-		$tester->executeTarget($target);
+		try {
+			$tester->executeTarget($target);
+			Assert::fail('Exception expected');
+		} catch (\BuildException $e) {
+			Assert::assertStringStartsWith($buildFilePath, $e->getLocation()->toString());
+			Assert::assertRegExp('~<file>.+`target`~', $e->getMessage());
+		}
 	}
 
 	public function testInvalidFileExistsMode(): void
 	{
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
+		$buildFilePath = __DIR__ . '/copy-files-task-integration-test.xml';
+		$tester = new PhingTester($buildFilePath);
 		$target = __FUNCTION__;
 
-		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageMatches('~invalid.+mode~i');
-
-		$tester->executeTarget($target);
+		try {
+			$tester->executeTarget($target);
+			Assert::fail('Exception expected');
+		} catch (\BuildException $e) {
+			Assert::assertStringStartsWith($buildFilePath, $e->getLocation()->toString());
+			Assert::assertRegExp('~invalid.+mode~i', $e->getMessage());
+		}
 	}
 
 }
