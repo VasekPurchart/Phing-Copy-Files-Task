@@ -20,7 +20,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 	public function copyFileDataProvider(): Generator
 	{
 		yield 'copy file' => [
-			'target' => 'testCopyFile',
+			'target' => 'copy-file',
 			'sourceFileName' => '/foo',
 			'targetFileName' => '/foo-copy',
 			'existingSourceFileContents' => 'FOO',
@@ -31,7 +31,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		];
 
 		yield 'copy file with absolute path' => [
-			'target' => 'testCopyFileWithAbsolutePath',
+			'target' => 'copy-file-with-absolute-path',
 			'sourceFileName' => '/foo',
 			'targetFileName' => '/foo-copy',
 			'existingSourceFileContents' => 'FOO',
@@ -42,7 +42,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		];
 
 		yield 'target file exists' => [
-			'target' => 'testTargetFileExists',
+			'target' => 'target-file-exists',
 			'sourceFileName' => '/new',
 			'targetFileName' => '/existing',
 			'existingSourceFileContents' => 'NEW',
@@ -53,7 +53,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		];
 
 		yield 'target file exists skip' => [
-			'target' => 'testTargetFileExistsSkip',
+			'target' => 'target-file-exists-skip',
 			'sourceFileName' => '/new',
 			'targetFileName' => '/existing',
 			'existingSourceFileContents' => 'NEW',
@@ -64,7 +64,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		];
 
 		yield 'target file exists replace' => [
-			'target' => 'testTargetFileExistsReplace',
+			'target' => 'target-file-exists-replace',
 			'sourceFileName' => '/new',
 			'targetFileName' => '/existing',
 			'existingSourceFileContents' => 'NEW',
@@ -124,7 +124,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		file_put_contents($targetFilePath, 'EXISTING');
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'target-file-exists-fail';
 
 		$tester->expectFailedBuild($target);
 
@@ -149,7 +149,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		}
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'copy-multiple-files';
 		$tester->executeTarget($target);
 
 		Assert::assertFileEquals($sourceFooFilePath, $targetFooFilePath);
@@ -171,7 +171,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		file_put_contents($targetBarFilePath, 'BAR-EXISTING');
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'replace-multiple-files-with-existing-targets';
 		$tester->executeTarget($target);
 
 		Assert::assertFileEquals($sourceFooFilePath, $targetFooFilePath);
@@ -201,7 +201,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		file_put_contents($targetDefaultFilePath, 'DEFAULT-EXISTING');
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'copy-multiple-files-with-existing-targets-using-different-modes';
 		$tester->executeTarget($target);
 
 		Assert::assertFileExists($targetSkipFilePath);
@@ -233,7 +233,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		file_put_contents($targetDefaultFilePath, 'DEFAULT-EXISTING');
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'copy-multiple-files-with-existing-targets-using-different-modes-with-replace-fallback';
 		$tester->executeTarget($target);
 
 		Assert::assertFileExists($targetSkipFilePath);
@@ -251,7 +251,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 	public function testCopyNonExistentFile(): void
 	{
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
-		$target = __FUNCTION__;
+		$target = 'copy-non-existent-file';
 
 		$tester->expectFailedBuild($target);
 
@@ -261,7 +261,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 	public function testCopyMultipleNonExistentFiles(): void
 	{
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
-		$target = __FUNCTION__;
+		$target = 'copy-multiple-non-existent-files';
 
 		$tester->expectFailedBuild($target);
 
@@ -279,7 +279,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		}
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'copy-file-to-non-existing-directory';
 
 		$tester->expectFailedBuild($target);
 
@@ -292,22 +292,22 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 	public function throwBuildExceptionDataProvider(): Generator
 	{
 		yield 'missing copy file element' => [
-			'target' => 'testMissingCopyFileElement',
+			'target' => 'missing-copy-file-element',
 			'expectedMessagePatternRegExp' => '~one.+<file>.+expected~',
 		];
 
 		yield 'missing source' => [
-			'target' => 'testMissingSource',
+			'target' => 'missing-source',
 			'expectedMessagePatternRegExp' => '~<file>.+`source`~',
 		];
 
 		yield 'missing target' => [
-			'target' => 'testMissingTarget',
+			'target' => 'missing-target',
 			'expectedMessagePatternRegExp' => '~<file>.+`target`~',
 		];
 
 		yield 'invalid file exists mode' => [
-			'target' => 'testInvalidFileExistsMode',
+			'target' => 'invalid-file-exists-mode',
 			'expectedMessagePatternRegExp' => '~invalid.+mode~i',
 		];
 	}
