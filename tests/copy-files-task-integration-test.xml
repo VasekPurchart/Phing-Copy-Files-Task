@@ -3,57 +3,57 @@
 
 	<taskdef name="copy-files" classname="VasekPurchart\Phing\CopyFiles\CopyFilesTask"/>
 
-	<target name="testCopyFile">
+	<target name="copy-file">
 		<copy-files>
 			<file source="foo" target="foo-copy"/>
 		</copy-files>
 	</target>
 
-	<target name="testCopyFileWithAbsolutePath">
+	<target name="copy-file-with-absolute-path">
 		<copy-files>
 			<file source="${project.basedir}/foo" target="${project.basedir}/foo-copy"/>
 		</copy-files>
 	</target>
 
-	<target name="testTargetFileExists">
+	<target name="target-file-exists">
 		<copy-files>
 			<file source="new" target="existing"/>
 		</copy-files>
 	</target>
 
-	<target name="testTargetFileExistsSkip">
+	<target name="target-file-exists-skip">
 		<copy-files existsmode="skip">
 			<file source="new" target="existing"/>
 		</copy-files>
 	</target>
 
-	<target name="testTargetFileExistsReplace">
+	<target name="target-file-exists-replace">
 		<copy-files existsmode="replace">
 			<file source="new" target="existing"/>
 		</copy-files>
 	</target>
 
-	<target name="testTargetFileExistsFail">
+	<target name="target-file-exists-fail">
 		<copy-files existsmode="fail">
 			<file source="new" target="existing"/>
 		</copy-files>
 	</target>
 
-	<target name="testCopyMultipleFiles">
+	<target name="copy-multiple-files">
 		<copy-files>
 			<file source="foo" target="foo-copy"/>
 			<file source="bar" target="bar-copy"/>
 		</copy-files>
 	</target>
 
-	<target name="testReplaceMultipleFilesWithExistingTargets">
+	<target name="replace-multiple-files-with-existing-targets">
 		<copy-files existsmode="replace">
 			<file source="foo-new" target="foo-existing"/>
 			<file source="bar-new" target="bar-existing"/>
 		</copy-files>
 	</target>
 
-	<target name="testCopyMultipleFilesWithExistingTargetsUsingDifferentModes">
+	<target name="copy-multiple-files-with-existing-targets-using-different-modes">
 		<copy-files>
 			<file source="skip-new" target="skip-existing" existsmode="skip"/>
 			<file source="replace-new" target="replace-existing" existsmode="replace"/>
@@ -61,7 +61,7 @@
 		</copy-files>
 	</target>
 
-	<target name="testCopyMultipleFilesWithExistingTargetsUsingDifferentModesWithReplaceFallback">
+	<target name="copy-multiple-files-with-existing-targets-using-different-modes-with-replace-fallback">
 		<copy-files existsmode="replace">
 			<file source="skip-new" target="skip-existing" existsmode="skip"/>
 			<file source="replace-new" target="replace-existing" existsmode="replace"/>
@@ -69,43 +69,43 @@
 		</copy-files>
 	</target>
 
-	<target name="testCopyNonExistentFile">
+	<target name="copy-non-existent-file">
 		<copy-files>
 			<file source="XXX" target="YYY"/>
 		</copy-files>
 	</target>
 
-	<target name="testCopyMultipleNonExistentFiles">
+	<target name="copy-multiple-non-existent-files">
 		<copy-files>
 			<file source="FOO" target="LOREM"/>
 			<file source="BAR" target="LOREM"/>
 		</copy-files>
 	</target>
 
-	<target name="testCopyFileToNonExistingDirectory">
+	<target name="copy-file-to-non-existing-directory">
 		<copy-files>
 			<file source="foo" target="non-existing-directory/foo-copy"/>
 		</copy-files>
 	</target>
 
-	<target name="testMissingCopyFileElement">
+	<target name="missing-copy-file-element">
 		<copy-files>
 		</copy-files>
 	</target>
 
-	<target name="testMissingSource">
+	<target name="missing-source">
 		<copy-files>
 			<file target="BAR"/>
 		</copy-files>
 	</target>
 
-	<target name="testMissingTarget">
+	<target name="missing-target">
 		<copy-files>
 			<file source="FOO"/>
 		</copy-files>
 	</target>
 
-	<target name="testInvalidFileExistsMode">
+	<target name="invalid-file-exists-mode">
 		<copy-files existsmode="invalid-mode">
 			<file source="new" target="existing"/>
 		</copy-files>
