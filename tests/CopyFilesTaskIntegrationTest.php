@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace VasekPurchart\Phing\CopyFiles;
 
+use Generator;
+use PHPUnit\Framework\Assert;
 use Project;
 use VasekPurchart\Phing\PhingTester\PhingTester;
 
@@ -12,85 +14,106 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 
 	private const TEMP_DIRECTORY_PATH = __DIR__ . '/temp';
 
-	public function testCopyFile(): void
+	/**
+	 * @return mixed[][]|\Generator
+	 */
+	public function copyFileDataProvider(): Generator
 	{
-		$sourceFilePath = self::TEMP_DIRECTORY_PATH . '/foo';
-		file_put_contents($sourceFilePath, 'FOO');
-		$targetFilePath = self::TEMP_DIRECTORY_PATH . '/foo-copy';
-		if (file_exists($targetFilePath)) {
+		yield 'copy file' => [
+			'target' => 'copy-file',
+			'sourceFileName' => '/foo',
+			'targetFileName' => '/foo-copy',
+			'existingSourceFileContents' => 'FOO',
+			'existingTargetFileContents' => null,
+			'expectedTargetFileContents' => 'FOO',
+			'logMessageRegExp' => '~Copying.+/foo.+->.+/foo-copy~',
+			'logMessagePriority' => Project::MSG_INFO,
+		];
+
+		yield 'copy file with absolute path' => [
+			'target' => 'copy-file-with-absolute-path',
+			'sourceFileName' => '/foo',
+			'targetFileName' => '/foo-copy',
+			'existingSourceFileContents' => 'FOO',
+			'existingTargetFileContents' => null,
+			'expectedTargetFileContents' => 'FOO',
+			'logMessageRegExp' => '~Copying.+/foo.+->.+/foo-copy~',
+			'logMessagePriority' => Project::MSG_INFO,
+		];
+
+		yield 'target file exists' => [
+			'target' => 'target-file-exists',
+			'sourceFileName' => '/new',
+			'targetFileName' => '/existing',
+			'existingSourceFileContents' => 'NEW',
+			'existingTargetFileContents' => 'EXISTING',
+			'expectedTargetFileContents' => 'EXISTING',
+			'logMessageRegExp' => '~/existing.+already exists.+SKIPPING~',
+			'logMessagePriority' => Project::MSG_INFO,
+		];
+
+		yield 'target file exists skip' => [
+			'target' => 'target-file-exists-skip',
+			'sourceFileName' => '/new',
+			'targetFileName' => '/existing',
+			'existingSourceFileContents' => 'NEW',
+			'existingTargetFileContents' => 'EXISTING',
+			'expectedTargetFileContents' => 'EXISTING',
+			'logMessageRegExp' => '~/existing.+already exists.+SKIPPING~',
+			'logMessagePriority' => Project::MSG_INFO,
+		];
+
+		yield 'target file exists replace' => [
+			'target' => 'target-file-exists-replace',
+			'sourceFileName' => '/new',
+			'targetFileName' => '/existing',
+			'existingSourceFileContents' => 'NEW',
+			'existingTargetFileContents' => 'EXISTING',
+			'expectedTargetFileContents' => 'NEW',
+			'logMessageRegExp' => '~/existing.+already exists~',
+			'logMessagePriority' => Project::MSG_VERBOSE,
+		];
+	}
+
+	/**
+	 * @dataProvider copyFileDataProvider
+	 *
+	 * @param string $target
+	 * @param string $sourceFileName
+	 * @param string $targetFileName
+	 * @param string $existingSourceFileContents
+	 * @param string|null $existingTargetFileContents
+	 * @param string $expectedTargetFileContents
+	 * @param string $logMessageRegExp
+	 * @param int $logMessagePriority
+	 */
+	public function testCopyFile(
+		string $target,
+		string $sourceFileName,
+		string $targetFileName,
+		string $existingSourceFileContents,
+		?string $existingTargetFileContents,
+		string $expectedTargetFileContents,
+		string $logMessageRegExp,
+		int $logMessagePriority
+	): void
+	{
+		$sourceFilePath = self::TEMP_DIRECTORY_PATH . $sourceFileName;
+		file_put_contents($sourceFilePath, $existingSourceFileContents);
+
+		$targetFilePath = self::TEMP_DIRECTORY_PATH . $targetFileName;
+		if ($existingTargetFileContents !== null) {
+			file_put_contents($targetFilePath, $existingTargetFileContents);
+		} elseif (file_exists($targetFilePath)) {
 			unlink($targetFilePath);
 		}
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
 		$tester->executeTarget($target);
 
-		$this->assertFileEquals($sourceFilePath, $targetFilePath);
-		$tester->assertLogMessageRegExp('~Copying.+/foo.+->.+/foo-copy~', $target, Project::MSG_INFO);
-	}
-
-	public function testCopyFileWithAbsolutePath(): void
-	{
-		$sourceFilePath = self::TEMP_DIRECTORY_PATH . '/foo';
-		file_put_contents($sourceFilePath, 'FOO');
-		$targetFilePath = self::TEMP_DIRECTORY_PATH . '/foo-copy';
-		if (file_exists($targetFilePath)) {
-			unlink($targetFilePath);
-		}
-
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
-		$tester->executeTarget($target);
-
-		$this->assertFileEquals($sourceFilePath, $targetFilePath);
-		$tester->assertLogMessageRegExp('~Copying.+/foo.+->.+/foo-copy~', $target, Project::MSG_INFO);
-	}
-
-	public function testTargetFileExists(): void
-	{
-		$sourceFilePath = self::TEMP_DIRECTORY_PATH . '/new';
-		file_put_contents($sourceFilePath, 'NEW');
-		$targetFilePath = self::TEMP_DIRECTORY_PATH . '/existing';
-		file_put_contents($targetFilePath, 'EXISTING');
-
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
-		$tester->executeTarget($target);
-
-		$this->assertFileExists($targetFilePath);
-		$this->assertSame('EXISTING', file_get_contents($targetFilePath));
-		$tester->assertLogMessageRegExp('~/existing.+already exists.+SKIPPING~', $target, Project::MSG_INFO);
-	}
-
-	public function testTargetFileExistsSkip(): void
-	{
-		$sourceFilePath = self::TEMP_DIRECTORY_PATH . '/new';
-		file_put_contents($sourceFilePath, 'NEW');
-		$targetFilePath = self::TEMP_DIRECTORY_PATH . '/existing';
-		file_put_contents($targetFilePath, 'EXISTING');
-
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
-		$tester->executeTarget($target);
-
-		$this->assertFileExists($targetFilePath);
-		$this->assertSame('EXISTING', file_get_contents($targetFilePath));
-		$tester->assertLogMessageRegExp('~/existing.+already exists.+SKIPPING~', $target, Project::MSG_INFO);
-	}
-
-	public function testTargetFileExistsReplace(): void
-	{
-		$sourceFilePath = self::TEMP_DIRECTORY_PATH . '/new';
-		file_put_contents($sourceFilePath, 'NEW');
-		$targetFilePath = self::TEMP_DIRECTORY_PATH . '/existing';
-		file_put_contents($targetFilePath, 'EXISTING');
-
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
-		$tester->executeTarget($target);
-
-		$this->assertFileEquals($sourceFilePath, $targetFilePath);
-		$tester->assertLogMessageRegExp('~/existing.+already exists~', $target, Project::MSG_VERBOSE);
+		Assert::assertFileExists($targetFilePath);
+		Assert::assertSame($expectedTargetFileContents, file_get_contents($targetFilePath));
+		$tester->assertLogMessageRegExp($logMessageRegExp, $target, $logMessagePriority);
 	}
 
 	public function testTargetFileExistsFail(): void
@@ -101,12 +124,12 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		file_put_contents($targetFilePath, 'EXISTING');
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'target-file-exists-fail';
 
 		$tester->expectFailedBuild($target);
 
-		$this->assertFileExists($targetFilePath);
-		$this->assertSame('EXISTING', file_get_contents($targetFilePath));
+		Assert::assertFileExists($targetFilePath);
+		Assert::assertSame('EXISTING', file_get_contents($targetFilePath));
 		$tester->assertLogMessageRegExp('~/existing.+already exists~', $target, Project::MSG_ERR);
 	}
 
@@ -126,12 +149,12 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		}
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'copy-multiple-files';
 		$tester->executeTarget($target);
 
-		$this->assertFileEquals($sourceFooFilePath, $targetFooFilePath);
+		Assert::assertFileEquals($sourceFooFilePath, $targetFooFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/foo.+->.+/foo-copy~', $target, Project::MSG_INFO);
-		$this->assertFileEquals($sourceBarFilePath, $targetBarFilePath);
+		Assert::assertFileEquals($sourceBarFilePath, $targetBarFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/bar.+->.+/bar-copy~', $target, Project::MSG_INFO);
 	}
 
@@ -148,14 +171,14 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		file_put_contents($targetBarFilePath, 'BAR-EXISTING');
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'replace-multiple-files-with-existing-targets';
 		$tester->executeTarget($target);
 
-		$this->assertFileEquals($sourceFooFilePath, $targetFooFilePath);
+		Assert::assertFileEquals($sourceFooFilePath, $targetFooFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/foo-new.+->.+/foo-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/foo-existing.+already exists~', $target, Project::MSG_VERBOSE);
 
-		$this->assertFileEquals($sourceBarFilePath, $targetBarFilePath);
+		Assert::assertFileEquals($sourceBarFilePath, $targetBarFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/bar-new.+->.+/bar-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/bar-existing.+already exists~', $target, Project::MSG_VERBOSE);
 	}
@@ -178,18 +201,18 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		file_put_contents($targetDefaultFilePath, 'DEFAULT-EXISTING');
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'copy-multiple-files-with-existing-targets-using-different-modes';
 		$tester->executeTarget($target);
 
-		$this->assertFileExists($targetSkipFilePath);
-		$this->assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
+		Assert::assertFileExists($targetSkipFilePath);
+		Assert::assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
 
-		$this->assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
+		Assert::assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/replace-new.+->.+/replace-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/replace-existing.+already exists~', $target, Project::MSG_VERBOSE);
 
-		$this->assertFileExists($targetDefaultFilePath);
-		$this->assertSame('DEFAULT-EXISTING', file_get_contents($targetDefaultFilePath));
+		Assert::assertFileExists($targetDefaultFilePath);
+		Assert::assertSame('DEFAULT-EXISTING', file_get_contents($targetDefaultFilePath));
 	}
 
 	public function testCopyMultipleFilesWithExistingTargetsUsingDifferentModesWithReplaceFallback(): void
@@ -210,17 +233,17 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		file_put_contents($targetDefaultFilePath, 'DEFAULT-EXISTING');
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'copy-multiple-files-with-existing-targets-using-different-modes-with-replace-fallback';
 		$tester->executeTarget($target);
 
-		$this->assertFileExists($targetSkipFilePath);
-		$this->assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
+		Assert::assertFileExists($targetSkipFilePath);
+		Assert::assertSame('SKIP-EXISTING', file_get_contents($targetSkipFilePath));
 
-		$this->assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
+		Assert::assertFileEquals($sourceReplaceFilePath, $targetReplaceFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/replace-new.+->.+/replace-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/replace-existing.+already exists~', $target, Project::MSG_VERBOSE);
 
-		$this->assertFileEquals($sourceDefaultFilePath, $targetDefaultFilePath);
+		Assert::assertFileEquals($sourceDefaultFilePath, $targetDefaultFilePath);
 		$tester->assertLogMessageRegExp('~Copying.+/default-new.+->.+/default-existing~', $target, Project::MSG_INFO);
 		$tester->assertLogMessageRegExp('~/default-existing.+already exists~', $target, Project::MSG_VERBOSE);
 	}
@@ -228,7 +251,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 	public function testCopyNonExistentFile(): void
 	{
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
-		$target = __FUNCTION__;
+		$target = 'copy-non-existent-file';
 
 		$tester->expectFailedBuild($target);
 
@@ -238,7 +261,7 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 	public function testCopyMultipleNonExistentFiles(): void
 	{
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
-		$target = __FUNCTION__;
+		$target = 'copy-multiple-non-existent-files';
 
 		$tester->expectFailedBuild($target);
 
@@ -256,55 +279,60 @@ class CopyFilesTaskIntegrationTest extends \PHPUnit\Framework\TestCase
 		}
 
 		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml', self::TEMP_DIRECTORY_PATH);
-		$target = __FUNCTION__;
+		$target = 'copy-file-to-non-existing-directory';
 
 		$tester->expectFailedBuild($target);
 
 		$tester->assertLogMessageRegExp('~/foo.+cannot be copied.+/foo-copy~', $target, Project::MSG_ERR);
 	}
 
-	public function testMissingCopyFileElement(): void
+	/**
+	 * @return mixed[][]|\Generator
+	 */
+	public function throwBuildExceptionDataProvider(): Generator
 	{
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
-		$target = __FUNCTION__;
+		yield 'missing copy file element' => [
+			'target' => 'missing-copy-file-element',
+			'expectedMessagePatternRegExp' => '~one.+<file>.+expected~',
+		];
 
-		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageMatches('~one.+<file>.+expected~');
+		yield 'missing source' => [
+			'target' => 'missing-source',
+			'expectedMessagePatternRegExp' => '~<file>.+`source`~',
+		];
 
-		$tester->executeTarget($target);
+		yield 'missing target' => [
+			'target' => 'missing-target',
+			'expectedMessagePatternRegExp' => '~<file>.+`target`~',
+		];
+
+		yield 'invalid file exists mode' => [
+			'target' => 'invalid-file-exists-mode',
+			'expectedMessagePatternRegExp' => '~invalid.+mode~i',
+		];
 	}
 
-	public function testMissingSource(): void
+	/**
+	 * @dataProvider throwBuildExceptionDataProvider
+	 *
+	 * @param string $target
+	 * @param string $expectedMessagePatternRegExp
+	 */
+	public function testThrowBuildException(
+		string $target,
+		string $expectedMessagePatternRegExp
+	): void
 	{
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
-		$target = __FUNCTION__;
+		$buildFilePath = __DIR__ . '/copy-files-task-integration-test.xml';
+		$tester = new PhingTester($buildFilePath);
 
-		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageMatches('~<file>.+`source`~');
-
-		$tester->executeTarget($target);
-	}
-
-	public function testMissingTarget(): void
-	{
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
-		$target = __FUNCTION__;
-
-		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageMatches('~<file>.+`target`~');
-
-		$tester->executeTarget($target);
-	}
-
-	public function testInvalidFileExistsMode(): void
-	{
-		$tester = new PhingTester(__DIR__ . '/copy-files-task-integration-test.xml');
-		$target = __FUNCTION__;
-
-		$this->expectException(\BuildException::class);
-		$this->expectExceptionMessageMatches('~invalid.+mode~i');
-
-		$tester->executeTarget($target);
+		try {
+			$tester->executeTarget($target);
+			Assert::fail('Exception expected');
+		} catch (\BuildException $e) {
+			Assert::assertStringStartsWith($buildFilePath, $e->getLocation()->toString());
+			Assert::assertRegExp($expectedMessagePatternRegExp, $e->getMessage());
+		}
 	}
 
 }
